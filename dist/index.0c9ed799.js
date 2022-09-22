@@ -538,12 +538,10 @@ class Order {
         drink: null,
         dessert: null
     };
-    selectedDish = null;
-    selectedDrink = null;
-    selectedDessert = null;
     btnConfirm = document.querySelector(".confirmar");
     btnCancel = document.querySelector(".cancelar");
     btnSendOrder = document.querySelector(".fazer-pedido");
+    modal = document.querySelector(".overlay");
     constructor(){
         this.options = [
             new Dish("Estrombelete de Frango", "frango_yin_yang.png", "Um pouco de batata, um pouco de salada", 14.9),
@@ -561,27 +559,18 @@ class Order {
                 this.selectMenuOption(o);
             });
         });
-        this.btnConfirm.addEventListener("click", ()=>{
-            //const selections = this.selections;
-            //const totalPrice = this.totalPrice;
-            //console.log(selections, totalPrice);
-            this.sendZap();
-        });
-        this.btnCancel.addEventListener("click", this.cancelOrder);
-        this.btnSendOrder.addEventListener("click", ()=>{
-            this.confirmOrder(this.selections);
-        });
+        this.btnConfirm.addEventListener("click", ()=>this.sendZap());
+        this.btnCancel.addEventListener("click", ()=>this.cancelOrder());
+        this.btnSendOrder.addEventListener("click", ()=>this.confirmOrder());
     }
     selectMenuOption(option) {
-        const selected = document.querySelector(`.${option.className} .selected`);
+        const selected = document.querySelector(`.${option.type} .selected`);
         if (selected !== null) selected.classList.remove("selected");
         option.element.classList.add("selected");
-        console.log(this.selections[option.className]);
-        this.selections[option.className] = {
+        this.selections[option.type] = {
             name: option.name,
             price: option.price
         };
-        console.log(this.selections[option.className]);
         this.verifyOrder();
     }
     get totalPrice() {
@@ -594,20 +583,16 @@ class Order {
             this.btnSendOrder.innerHTML = "Fazer pedido";
         }
     }
-    confirmOrder(selections) {
-        const modal = document.querySelector(".overlay");
-        modal.classList.remove("escondido");
-        document.querySelector(".confirmar-pedido .dish .nome").innerHTML = this.selections["dish"].name;
-        document.querySelector(".confirmar-pedido .dish .preco").innerHTML = this.selections["dish"].price.toFixed(2);
-        document.querySelector(".confirmar-pedido .drink .nome").innerHTML = this.selections["drink"].name;
-        document.querySelector(".confirmar-pedido .drink .preco").innerHTML = this.selections["drink"].price.toFixed(2);
-        document.querySelector(".confirmar-pedido .dessert .nome").innerHTML = this.selections["dessert"].name;
-        document.querySelector(".confirmar-pedido .dessert .preco").innerHTML = this.selections["dessert"].price.toFixed(2);
+    confirmOrder() {
+        this.modal.classList.remove("escondido");
+        for(const option in this.selections){
+            document.querySelector(`.confirmar-pedido .${option} .nome`).innerHTML = this.selections[option].name;
+            document.querySelector(`.confirmar-pedido .${option} .preco`).innerHTML = this.selections[option].price.toFixed(2);
+        }
         document.querySelector(".confirmar-pedido .total .preco").innerHTML = this.totalPrice.toFixed(2);
     }
     cancelOrder() {
-        const modal = document.querySelector(".overlay");
-        modal.classList.add("escondido");
+        this.modal.classList.add("escondido");
     }
     sendZap() {
         const telefoneRestaurante = 553299999999;
@@ -617,21 +602,16 @@ class Order {
     }
 }
 class MenuOption {
-    constructor(name, image, description, price, className, imageRoot = "img/"){
+    constructor(name, image, description, price, type, imageRoot = "img/"){
         this.name = name;
         this.image = imageRoot + image;
         this.description = description;
         this.price = price;
-        this.className = className;
+        this.type = type;
         this.element = document.createElement("div");
-        const menuOptionContainer = document.querySelector(`.opcoes.${className}`);
+        const menuOptionContainer = document.querySelector(`.opcoes.${type}`);
         this.createMenuOptionView();
         menuOptionContainer.appendChild(this.element);
-    }
-    selectMenuOption() {
-        const selected = document.querySelector(`.${this.className} .selected`);
-        if (selected !== null) selected.classList.remove("selected");
-        this.element.classList.add("selected");
     }
     createMenuOptionView() {
         this.element.classList.add("opcao");
@@ -663,7 +643,7 @@ class Dessert extends MenuOption {
         super(name, image, description, price, "dessert", _imageRoot = "img/");
     }
 }
-const order = new Order();
+new Order();
 
 },{}]},["jNGEO","cZXDC"], "cZXDC", "parcelRequire2f17")
 
